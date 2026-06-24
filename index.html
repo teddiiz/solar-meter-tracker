@@ -1,216 +1,91 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Solar Meter" />
-  <meta name="theme-color" content="#2563eb" />
-
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="icons/icon-180.png" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <title>Solar Meter Tracker</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root{
-      --bg:#f5f7fb;--card:#ffffff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;
-      --primary:#2563eb;--primary2:#1d4ed8;--sun:#f59e0b;--night:#6366f1;--green:#10b981;--red:#ef4444;
-      --radius:18px;--shadow:0 10px 30px rgba(15,23,42,.08);
-    }
-    *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text)}
-    .app{max-width:980px;margin:0 auto;padding:16px 14px 90px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-    h1{font-size:24px;margin:0;line-height:1.2}.sub{color:var(--muted);font-size:13px;margin-top:4px}.badge{background:#dbeafe;color:#1e40af;border-radius:999px;padding:8px 11px;font-weight:700;font-size:12px;white-space:nowrap}
-    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px}.stat .label{font-size:12px;color:var(--muted)}.stat .num{font-size:24px;font-weight:800;margin-top:5px}.stat .hint{font-size:12px;color:var(--muted);margin-top:3px}
-    .section-title{font-size:18px;font-weight:800;margin:22px 0 10px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:block;font-size:13px;color:#374151;font-weight:700;margin-bottom:6px}
-    input,select,textarea{width:100%;border:1px solid #d1d5db;border-radius:13px;padding:12px;font-size:16px;background:#fff;color:var(--text)}input[type=file]{font-size:14px;padding:10px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    button{border:0;border-radius:14px;padding:12px 14px;font-size:15px;font-weight:800;cursor:pointer;background:#e5e7eb;color:#111827}button.primary{background:var(--primary);color:white}button.primary:hover{background:var(--primary2)}button.good{background:var(--green);color:#fff}button.danger{background:#fee2e2;color:#991b1b}.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f3f4f6;color:#374151;font-size:12px;font-weight:700}.tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;z-index:20}.tabbar{max-width:980px;width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:0}.tab{padding:10px 4px;text-align:center;font-size:12px;color:#6b7280;font-weight:700}.tab.active{color:var(--primary)}.tab span{display:block;font-size:20px;margin-bottom:2px}.page{display:none}.page.active{display:block}.photo-preview{width:100%;max-height:220px;object-fit:contain;background:#f9fafb;border:1px dashed #cbd5e1;border-radius:14px;margin-top:8px}.table-wrap{overflow:auto;border-radius:15px;border:1px solid var(--line);background:#fff}table{width:100%;border-collapse:collapse;min-width:780px}th,td{padding:11px;border-bottom:1px solid var(--line);font-size:13px;text-align:left;vertical-align:top}th{background:#f9fafb;color:#374151;position:sticky;top:0}.small{font-size:12px;color:var(--muted)}.meter-img{width:58px;height:58px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.notice{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:15px;padding:12px;font-size:13px}.two{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}.analysis-box{display:grid;gap:10px}.bar{height:12px;border-radius:999px;background:#e5e7eb;overflow:hidden}.bar>div{height:100%;background:linear-gradient(90deg,var(--sun),var(--green));width:0%}.empty{text-align:center;color:var(--muted);padding:26px}.kpi{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed #e5e7eb;padding-bottom:8px}.kpi:last-child{border-bottom:0}.kpi b{font-size:18px}.footer-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px}.hide{display:none!important}
-
-    html{min-height:100%;-webkit-text-size-adjust:100%;touch-action:manipulation;background:var(--bg)}
-    body{min-height:100%;padding-top:env(safe-area-inset-top);overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
-    .app{width:100%;max-width:980px;margin:0 auto;padding:16px max(14px,env(safe-area-inset-left)) calc(92px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right))}
-    .card,.tabs{backdrop-filter:saturate(160%) blur(10px)}
-    input,select,textarea,button{font-size:16px;-webkit-appearance:none;appearance:none;touch-action:manipulation}
-    input[type=date],input[type=time],select{min-height:48px}
-    input[type=file]{min-height:48px;background:#fff}
-    textarea{resize:vertical}
-    button{min-height:48px;line-height:1.15}
-    .tabs{padding-bottom:env(safe-area-inset-bottom)}
-    .tab{min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;user-select:none}
-    .photo-preview{max-height:45vh}
-    .table-wrap{-webkit-overflow-scrolling:touch}
-    canvas{max-width:100%}
-    @supports (-webkit-touch-callout:none){
-      input,select,textarea{font-size:16px!important}
-      .tabs{background:rgba(255,255,255,.94)}
-    }
-    @media(max-width:760px){
-      .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-      .form-grid,.two,.row{grid-template-columns:1fr;gap:10px}
-      .top{align-items:flex-start}.app{padding-top:14px}.section-title{font-size:17px;margin:18px 0 9px}
-      h1{font-size:21px}.sub{font-size:12px}.stat .num{font-size:21px}.card{padding:13px;border-radius:17px}.badge{display:none}
-      .btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btns button{width:100%}
-      .btns button.primary,.btns button.good{grid-column:span 2}
-      table{min-width:720px}th,td{padding:10px 9px}.meter-img{width:64px;height:64px}
-    }
-    @media(max-width:430px){.app{padding-left:12px;padding-right:12px}.grid{grid-template-columns:1fr 1fr}.stat .num{font-size:19px}.tab{font-size:11px}.tab span{font-size:19px}.btns{grid-template-columns:1fr}.btns button.primary,.btns button.good{grid-column:auto}}
-    @media(max-width:340px){.grid{grid-template-columns:1fr}h1{font-size:19px}}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="จดมิเตอร์ไฟ" />
+<meta name="theme-color" content="#2563eb" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icons/icon-180.png" />
+<title>Solar Meter Tracker</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--primary:#2563eb;--green:#10b981;--red:#ef4444;--sun:#f59e0b;--night:#6366f1;--radius:18px;--shadow:0 10px 28px rgba(15,23,42,.08)}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;background:var(--bg)}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text);padding-top:env(safe-area-inset-top)}
+.app{max-width:980px;margin:0 auto;padding:16px max(14px,env(safe-area-inset-left)) calc(94px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right))}.top{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px;align-items:flex-start}h1{font-size:23px;margin:0}.sub{font-size:13px;color:var(--muted);margin-top:4px}.badge{background:#dbeafe;color:#1e40af;border-radius:999px;padding:8px 11px;font-weight:800;font-size:12px;white-space:nowrap}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px}.stat .label{font-size:12px;color:var(--muted)}.stat .num{font-size:23px;font-weight:900;margin-top:5px}.stat .hint{font-size:12px;color:var(--muted);margin-top:4px}.section-title{font-size:18px;font-weight:900;margin:22px 0 10px}.page{display:none}.page.active{display:block}.form-grid,.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:block;font-size:13px;color:#374151;font-weight:800;margin-bottom:6px}input,select,textarea,button{font-size:16px;-webkit-appearance:none;appearance:none}input,select,textarea{width:100%;border:1px solid #d1d5db;border-radius:13px;padding:12px;background:#fff;color:var(--text);min-height:48px}textarea{resize:vertical}button{border:0;border-radius:14px;padding:12px 14px;min-height:48px;font-weight:900;background:#e5e7eb;color:#111827}button.primary{background:var(--primary);color:white}button.good{background:var(--green);color:white}button.danger{background:#fee2e2;color:#991b1b}.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.photo-preview{width:100%;max-height:45vh;object-fit:contain;background:#f9fafb;border:1px dashed #cbd5e1;border-radius:14px;margin-top:8px}.hide{display:none!important}.notice{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:15px;padding:12px;font-size:13px;line-height:1.5}.two{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}.bar{height:12px;border-radius:99px;background:#e5e7eb;overflow:hidden}.bar>div{height:100%;background:linear-gradient(90deg,var(--sun),var(--green));width:0}.kpi{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding:7px 0}.kpi:last-child{border-bottom:0}.kpi b{font-size:18px}.table-wrap{overflow:auto;border-radius:15px;border:1px solid var(--line);background:#fff;-webkit-overflow-scrolling:touch}table{width:100%;border-collapse:collapse;min-width:780px}th,td{padding:11px;border-bottom:1px solid var(--line);font-size:13px;text-align:left;vertical-align:top}th{background:#f9fafb;color:#374151}.small{font-size:12px;color:var(--muted)}.meter-img{width:62px;height:62px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.footer-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px}.tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.95);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:20;padding-bottom:env(safe-area-inset-bottom);backdrop-filter:blur(10px)}.tabbar{max-width:980px;width:100%;display:grid;grid-template-columns:repeat(4,1fr)}.tab{min-height:58px;padding:8px 4px;text-align:center;font-size:12px;color:#6b7280;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center}.tab.active{color:var(--primary)}.tab span{font-size:20px;display:block;margin-bottom:2px}.chart{width:100%;height:220px}.empty{text-align:center;color:var(--muted);padding:25px}.status{font-size:13px;margin-top:8px;color:#065f46;font-weight:800}
+@media(max-width:760px){.grid{grid-template-columns:1fr 1fr}.form-grid,.row,.two{grid-template-columns:1fr}.badge{display:none}.card{padding:13px}.btns{display:grid;grid-template-columns:1fr 1fr}.btns button.primary,.btns button.good{grid-column:span 2}h1{font-size:21px}}
+@media(max-width:430px){.app{padding-left:12px;padding-right:12px}.btns{grid-template-columns:1fr}.btns button.primary,.btns button.good{grid-column:auto}.stat .num{font-size:19px}table{min-width:720px}}
+</style>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div><h1>บันทึกหน่วยไฟ Solar</h1><div class="sub">จดมิเตอร์เช้า 07.00–08.00 และเย็น 18.00–19.00 ทุกวัน</div></div><div class="badge">Offline Data</div></div>
+  <div class="top"><div><h1>บันทึกหน่วยไฟ Solar</h1><div class="sub">จดมิเตอร์เช้า 07.00–08.00 และเย็น 18.00–19.00 ทุกวัน</div></div><div class="badge">iPhone Ready</div></div>
 
   <section id="dashboard" class="page active">
     <div class="grid">
       <div class="card stat"><div class="label">ใช้ไฟกลางวันล่าสุด</div><div class="num" id="dayUse">-</div><div class="hint">เย็น - เช้า</div></div>
       <div class="card stat"><div class="label">ใช้ไฟกลางคืนล่าสุด</div><div class="num" id="nightUse">-</div><div class="hint">เช้าวันถัดไป - เย็นวันก่อน</div></div>
       <div class="card stat"><div class="label">เฉลี่ยกลางวัน</div><div class="num" id="avgDay">-</div><div class="hint">เหมาะกับ Solar</div></div>
-      <div class="card stat"><div class="label">เฉลี่ยกลางคืน</div><div class="num" id="avgNight">-</div><div class="hint">อาจต้องใช้ไฟจากการไฟฟ้า</div></div>
+      <div class="card stat"><div class="label">เฉลี่ยกลางคืน</div><div class="num" id="avgNight">-</div><div class="hint">ใช้ไฟหลังพระอาทิตย์ตก</div></div>
     </div>
     <div class="section-title">กราฟการใช้ไฟ</div>
-    <div class="card"><canvas id="usageChart" height="160"></canvas></div>
+    <div class="card"><div id="chart" class="chart"></div></div>
     <div class="section-title">สรุปติดตั้งโซล่าเซลล์</div>
-    <div class="two">
-      <div class="card analysis-box">
-        <div class="kpi"><span>สัดส่วนใช้ไฟช่วงกลางวัน</span><b id="dayPercent">-</b></div>
-        <div class="bar"><div id="dayBar"></div></div>
-        <div class="kpi"><span>หน่วยไฟรวมที่บันทึกได้</span><b id="totalUse">-</b></div>
-        <div class="kpi"><span>คำแนะนำเบื้องต้น</span><b id="solarHint">-</b></div>
-      </div>
-      <div class="notice">หลักคิด: ไฟที่ใช้ช่วงกลางวันคือส่วนที่ Solar On-grid ช่วยลดได้ดีที่สุด ส่วนกลางคืนต้องพึ่งไฟบ้าน หรือใช้แบตเตอรี่ร่วมด้วย</div>
-    </div>
+    <div class="two"><div class="card"><div class="kpi"><span>สัดส่วนใช้ไฟกลางวัน</span><b id="dayPercent">-</b></div><div class="bar"><div id="dayBar"></div></div><div class="kpi"><span>หน่วยไฟรวม</span><b id="totalUse">-</b></div><div class="kpi"><span>คำแนะนำ</span><b id="solarHint">-</b></div></div><div class="notice">ข้อมูลจะเก็บในเครื่องนี้ด้วย IndexedDB ซึ่งเหมาะกับ iPhone และรองรับรูปได้ดีกว่า localStorage</div></div>
   </section>
 
   <section id="record" class="page">
-    <div class="section-title">บันทึกข้อมูลวันนี้</div>
+    <div class="section-title">บันทึกข้อมูล</div>
     <div class="card">
-      <div class="form-grid">
-        <div><label>วันที่</label><input type="date" id="date"></div>
-        <div><label>รอบที่จด</label><select id="period"><option value="morning">เช้า 07.00 - 08.00</option><option value="evening">เย็น 18.00 - 19.00</option></select></div>
-        <div><label>เวลา</label><input type="time" id="time"></div>
-        <div><label>เลขมิเตอร์ / หน่วยไฟ</label><input type="number" id="meter" step="0.01" placeholder="เช่น 12580.5"></div>
-      </div>
-      <div style="margin-top:12px"><label>รูปมิเตอร์</label><input type="file" id="photo" accept="image/*" capture="environment"><img id="preview" class="photo-preview hide"></div>
+      <div class="form-grid"><div><label>วันที่</label><input type="date" id="date"></div><div><label>รอบที่จด</label><select id="period"><option value="morning">เช้า 07.00 - 08.00</option><option value="evening">เย็น 18.00 - 19.00</option></select></div><div><label>เวลา</label><input type="time" id="time"></div><div><label>เลขมิเตอร์ / หน่วยไฟ</label><input type="number" id="meter" step="0.01" placeholder="เช่น 12580.5"></div></div>
+      <div style="margin-top:12px"><label>รูปมิเตอร์</label><div class="btns" style="margin-top:0"><button type="button" onclick="photoLibrary.click()">เลือกรูปจากคลังภาพ</button><button type="button" onclick="photoCamera.click()">ถ่ายรูปใหม่</button></div><input class="hide" type="file" id="photoLibrary" accept="image/*"><input class="hide" type="file" id="photoCamera" accept="image/*" capture="environment"><img id="preview" class="photo-preview hide"><div class="small" style="margin-top:6px">บน iPhone ให้กด “เลือกรูปจากคลังภาพ” ถ้าต้องการเลือกจาก Photos ไม่ใช่ถ่ายใหม่</div></div>
       <div style="margin-top:12px"><label>หมายเหตุ</label><textarea id="note" rows="2" placeholder="เช่น วันนี้เปิดแอร์นาน / มีคนอยู่บ้านทั้งวัน"></textarea></div>
-      <div class="btns"><button class="primary" onclick="saveRecord()">บันทึกข้อมูล</button><button onclick="fillNow()">ใส่เวลาปัจจุบัน</button><button class="danger" onclick="clearForm()">ล้างฟอร์ม</button></div>
-      <div class="footer-note">รูปภาพจะถูกย่อขนาดอัตโนมัติและบันทึกไว้ใน Browser เครื่องนี้ ไม่ได้อัปโหลดขึ้น Server</div>
+      <div class="btns"><button class="primary" onclick="saveRecord()">บันทึกข้อมูล</button><button onclick="fillNow()">ใส่เวลาปัจจุบัน</button><button class="danger" onclick="clearForm()">ล้างฟอร์ม</button></div><div id="saveStatus" class="status"></div>
+      <div class="footer-note">รูปจะถูกย่อก่อนบันทึก เพื่อลดปัญหาพื้นที่เต็ม</div>
     </div>
   </section>
 
-  <section id="history" class="page">
-    <div class="section-title">ประวัติการบันทึก</div>
-    <div class="btns" style="margin-bottom:10px"><button class="good" onclick="exportCSV()">Export CSV</button><button onclick="backupJSON()">Backup JSON</button><button onclick="document.getElementById('importFile').click()">Import Backup</button><button class="danger" onclick="deleteAll()">ลบทั้งหมด</button><input id="importFile" type="file" accept="application/json" class="hide" onchange="importJSON(event)"></div>
-    <div class="table-wrap"><table><thead><tr><th>วันที่</th><th>เช้า</th><th>รูปเช้า</th><th>เย็น</th><th>รูปเย็น</th><th>กลางวัน</th><th>กลางคืน</th><th>จัดการ</th></tr></thead><tbody id="historyBody"></tbody></table></div>
-  </section>
+  <section id="history" class="page"><div class="section-title">ประวัติการบันทึก</div><div class="btns" style="margin-bottom:10px"><button class="good" onclick="exportCSV()">Export CSV</button><button onclick="backupJSON()">Backup JSON</button><button class="danger" onclick="deleteAll()">ลบทั้งหมด</button></div><div class="table-wrap"><table><thead><tr><th>วันที่</th><th>เช้า</th><th>รูปเช้า</th><th>เย็น</th><th>รูปเย็น</th><th>กลางวัน</th><th>กลางคืน</th><th>จัดการ</th></tr></thead><tbody id="historyBody"></tbody></table></div></section>
 
-  <section id="settings" class="page">
-    <div class="section-title">ตั้งค่า</div>
-    <div class="notice" style="margin-bottom:12px">สำหรับ iPhone/iPad: เปิดไฟล์นี้ใน Safari แล้วกด Share → Add to Home Screen เพื่อใช้งานเต็มจอเหมือนแอป</div>
-    <div class="card">
-      <div class="form-grid">
-        <div><label>เวลาแจ้งเตือนรอบเช้า</label><input type="time" id="morningReminder" value="07:30"></div>
-        <div><label>เวลาแจ้งเตือนรอบเย็น</label><input type="time" id="eveningReminder" value="18:30"></div>
-        <div><label>ค่าไฟประมาณ / หน่วย</label><input type="number" id="pricePerUnit" step="0.01" value="4.50"></div>
-        <div><label>ดูข้อมูลย้อนหลัง</label><select id="rangeDays"><option value="7">7 วัน</option><option value="14">14 วัน</option><option value="30" selected>30 วัน</option><option value="90">90 วัน</option><option value="9999">ทั้งหมด</option></select></div>
-      </div>
-      <div class="btns"><button class="primary" onclick="saveSettings()">บันทึกตั้งค่า</button><button onclick="requestNotify()">เปิดแจ้งเตือน</button></div>
-      <div class="footer-note">หมายเหตุ: การแจ้งเตือนในไฟล์ HTML อาจขึ้นกับ Browser และระบบมือถือ หากต้องการเตือนแน่นอน แนะนำตั้ง Alarm ในมือถือคู่กันไว้ก่อน</div>
-    </div>
-  </section>
+  <section id="settings" class="page"><div class="section-title">ตั้งค่า / สำรองข้อมูล</div><div class="card"><div class="form-grid"><div><label>เตือนรอบเช้า</label><input type="time" id="morningReminder" value="07:30"></div><div><label>เตือนรอบเย็น</label><input type="time" id="eveningReminder" value="18:30"></div><div><label>ค่าไฟต่อหน่วย</label><input type="number" id="pricePerUnit" step="0.01" value="4.5"></div><div><label>ช่วงวันที่ใช้วิเคราะห์</label><select id="rangeDays"><option value="7">7 วัน</option><option value="30" selected>30 วัน</option><option value="90">90 วัน</option><option value="9999">ทั้งหมด</option></select></div></div><div class="btns"><button class="primary" onclick="saveSettings()">บันทึกตั้งค่า</button><button onclick="requestNotify()">เปิดแจ้งเตือน</button></div></div><div class="section-title">นำเข้าข้อมูล</div><div class="card"><input type="file" accept="application/json,.json" onchange="importJSON(event)"><div class="footer-note">ใช้ไฟล์ Backup JSON เพื่อย้ายเครื่องหรือกู้ข้อมูล</div></div></section>
 </div>
 
-<nav class="tabs"><div class="tabbar">
-  <div class="tab active" onclick="showPage('dashboard',this)"><span>📊</span>สรุป</div>
-  <div class="tab" onclick="showPage('record',this)"><span>✍️</span>บันทึก</div>
-  <div class="tab" onclick="showPage('history',this)"><span>📁</span>ประวัติ</div>
-  <div class="tab" onclick="showPage('settings',this)"><span>⚙️</span>ตั้งค่า</div>
-</div></nav>
-
+<nav class="tabs"><div class="tabbar"><div class="tab active" onclick="showPage('dashboard',this)"><span>📊</span>สรุป</div><div class="tab" onclick="showPage('record',this)"><span>➕</span>บันทึก</div><div class="tab" onclick="showPage('history',this)"><span>📁</span>ประวัติ</div><div class="tab" onclick="showPage('settings',this)"><span>⚙️</span>ตั้งค่า</div></div></nav>
 <script>
-const KEY='solar_meter_records_v2'; const OLD_KEY='solar_meter_records_v1'; const SET='solar_meter_settings_v2'; const OLD_SET='solar_meter_settings_v1'; let chart=null;
-const $=id=>document.getElementById(id);
-function today(){return new Date().toISOString().slice(0,10)}
-function nowTime(){return new Date().toTimeString().slice(0,5)}
-
-function safeJSON(txt, fallback){try{return JSON.parse(txt||'')}catch(e){return fallback}}
-function migrateOldData(){
-  if(!localStorage.getItem(KEY) && localStorage.getItem(OLD_KEY)) localStorage.setItem(KEY, localStorage.getItem(OLD_KEY));
-  if(!localStorage.getItem(SET) && localStorage.getItem(OLD_SET)) localStorage.setItem(SET, localStorage.getItem(OLD_SET));
-}
-function load(){migrateOldData(); return safeJSON(localStorage.getItem(KEY),'[]') || []}
-function save(data){
-  try{
-    localStorage.setItem(KEY,JSON.stringify(data));
-    localStorage.setItem(KEY+'_last_saved', new Date().toISOString());
-    return true;
-  }catch(e){
-    alert('บันทึกไม่สำเร็จ: พื้นที่เก็บข้อมูลใน Browser เต็ม หรือเปิดในโหมดที่ไม่เก็บข้อมูลถาวร\n\nแนะนำ: ลดขนาดรูป/ไม่แนบรูปใหญ่ หรือกด Backup JSON เก็บไว้');
-    console.error(e);
-    return false;
-  }
-}
-function loadSettings(){migrateOldData(); return Object.assign({morningReminder:'07:30',eveningReminder:'18:30',pricePerUnit:4.5,rangeDays:30},safeJSON(localStorage.getItem(SET),'{}')||{})}
-
-function init(){ migrateOldData(); $('date').value=today(); fillNow(); const s=loadSettings(); $('morningReminder').value=s.morningReminder; $('eveningReminder').value=s.eveningReminder; $('pricePerUnit').value=s.pricePerUnit; $('rangeDays').value=s.rangeDays; render(); setInterval(checkReminder,60000); }
-function fillNow(){ $('time').value=nowTime(); const h=new Date().getHours(); $('period').value = h<13?'morning':'evening'; }
-function clearForm(){ $('meter').value=''; $('note').value=''; $('photo').value=''; $('preview').src=''; $('preview').classList.add('hide'); }
-
-async function compressImage(file, maxSize=1200, quality=.72){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>{
-      const img=new Image();
-      img.onload=()=>{
-        let w=img.width,h=img.height;
-        const scale=Math.min(1,maxSize/Math.max(w,h));
-        w=Math.round(w*scale); h=Math.round(h*scale);
-        const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
-        resolve(canvas.toDataURL('image/jpeg',quality));
-      };
-      img.onerror=reject; img.src=reader.result;
-    };
-    reader.onerror=reject; reader.readAsDataURL(file);
-  });
-}
-$('photo').addEventListener('change', async e=>{ 
-  const f=e.target.files[0]; if(!f)return; 
-  try{
-    const dataUrl=await compressImage(f);
-    $('preview').src=dataUrl; $('preview').classList.remove('hide');
-  }catch(err){
-    alert('อ่านรูปไม่สำเร็จ ลองเลือกรูปใหม่อีกครั้ง');
-  }
-});
-
-function saveRecord(){ const date=$('date').value, period=$('period').value, time=$('time').value, meter=parseFloat($('meter').value); if(!date||!time||isNaN(meter)){alert('กรุณาใส่วันที่ เวลา และเลขมิเตอร์');return;} let data=load(); let day=data.find(x=>x.date===date); if(!day){day={date,morning:null,evening:null}; data.push(day);} day[period]={time,meter,photo:$('preview').src||'',note:$('note').value||''}; data.sort((a,b)=>a.date.localeCompare(b.date)); if(!save(data))return; clearForm(); $('date').value=date; alert('บันทึกแล้ว และเก็บไว้ในเครื่องเรียบร้อย'); render(); showPage('dashboard',document.querySelectorAll('.tab')[0]); }
-function calcRows(){ const data=load().sort((a,b)=>a.date.localeCompare(b.date)); return data.map((d,i)=>{ const dayUse=d.morning&&d.evening? +(d.evening.meter-d.morning.meter).toFixed(2):null; const next=data[i+1]; const nightUse=d.evening&&next&&next.morning? +(next.morning.meter-d.evening.meter).toFixed(2):null; return {...d,dayUse,nightUse}; }); }
-function filteredRows(){ const s=loadSettings(); const rows=calcRows(); if(+s.rangeDays>=9999)return rows; const min=new Date(); min.setDate(min.getDate()-Number(s.rangeDays)+1); const minStr=min.toISOString().slice(0,10); return rows.filter(r=>r.date>=minStr); }
-function avg(arr){ const v=arr.filter(x=>typeof x==='number'&&!isNaN(x)&&x>=0); return v.length? +(v.reduce((a,b)=>a+b,0)/v.length).toFixed(2):null; }
-function render(){ renderHistory(); renderDashboard(); }
-function unit(x){return x==null?'-':x+' หน่วย'}
-function renderDashboard(){ const rows=filteredRows(); const latestDay=[...rows].reverse().find(r=>r.dayUse!=null); const latestNight=[...rows].reverse().find(r=>r.nightUse!=null); const ad=avg(rows.map(r=>r.dayUse)); const an=avg(rows.map(r=>r.nightUse)); $('dayUse').textContent=unit(latestDay?.dayUse); $('nightUse').textContent=unit(latestNight?.nightUse); $('avgDay').textContent=unit(ad); $('avgNight').textContent=unit(an); const totalDay=rows.reduce((s,r)=>s+(r.dayUse>0?r.dayUse:0),0); const totalNight=rows.reduce((s,r)=>s+(r.nightUse>0?r.nightUse:0),0); const total=+(totalDay+totalNight).toFixed(2); const pct=total?Math.round(totalDay/total*100):0; $('dayPercent').textContent=total?pct+'%':'-'; $('dayBar').style.width=pct+'%'; $('totalUse').textContent=total?total+' หน่วย':'-'; $('solarHint').textContent=!total?'-':pct>=60?'คุ้มกับ On-grid มาก':pct>=40?'น่าสนใจ ควรประเมินโหลดกลางวัน':'กลางคืนสูง อาจต้องดูแบต/ปรับพฤติกรรม'; const ctx=$('usageChart'); const labels=rows.map(r=>r.date.slice(5)); const day=rows.map(r=>r.dayUse??0); const night=rows.map(r=>r.nightUse??0); if(chart)chart.destroy(); chart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'กลางวัน',data:day},{label:'กลางคืน',data:night}]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,title:{display:true,text:'หน่วย'}}}}}); }
-function renderHistory(){ const rows=calcRows().slice().reverse(); const body=$('historyBody'); if(!rows.length){body.innerHTML='<tr><td colspan="8" class="empty">ยังไม่มีข้อมูล</td></tr>';return;} body.innerHTML=rows.map(r=>`<tr><td><b>${r.date}</b></td><td>${r.morning?`${r.morning.meter}<br><span class="small">${r.morning.time}</span><br><span class="small">${r.morning.note||''}</span>`:'-'}</td><td>${r.morning?.photo?`<img class="meter-img" src="${r.morning.photo}" onclick="openImg(this.src)">`:'-'}</td><td>${r.evening?`${r.evening.meter}<br><span class="small">${r.evening.time}</span><br><span class="small">${r.evening.note||''}</span>`:'-'}</td><td>${r.evening?.photo?`<img class="meter-img" src="${r.evening.photo}" onclick="openImg(this.src)">`:'-'}</td><td>${unit(r.dayUse)}</td><td>${unit(r.nightUse)}</td><td><button class="danger" onclick="deleteDate('${r.date}')">ลบ</button></td></tr>`).join(''); }
-function openImg(src){ const w=window.open(''); w.document.write(`<img src="${src}" style="max-width:100%;height:auto">`); }
-function deleteDate(date){ if(!confirm('ลบข้อมูลวันที่ '+date+' ?'))return; if(save(load().filter(x=>x.date!==date))) render(); }
-function deleteAll(){ if(!confirm('ลบข้อมูลทั้งหมดจริงไหม?'))return; localStorage.removeItem(KEY); localStorage.removeItem(KEY+'_last_saved'); render(); }
-function exportCSV(){ const rows=calcRows(); let csv='date,morning_time,morning_meter,evening_time,evening_meter,day_use,night_use,morning_note,evening_note\n'; rows.forEach(r=>{csv += [r.date,r.morning?.time||'',r.morning?.meter||'',r.evening?.time||'',r.evening?.meter||'',r.dayUse??'',r.nightUse??'',`"${(r.morning?.note||'').replaceAll('"','""')}"`,`"${(r.evening?.note||'').replaceAll('"','""')}"`].join(',')+'\n';}); download('solar-meter-data.csv',csv,'text/csv;charset=utf-8'); }
-function backupJSON(){ download('solar-meter-backup.json',JSON.stringify({records:load(),settings:loadSettings()},null,2),'application/json'); }
-function importJSON(e){ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{try{const obj=JSON.parse(r.result); if(Array.isArray(obj)){ if(!save(obj)) return; } else if(obj.records){ if(!save(obj.records)) return; } if(obj.settings)localStorage.setItem(SET,JSON.stringify(obj.settings)); alert('Import สำเร็จ'); init();}catch(err){alert('ไฟล์ไม่ถูกต้อง')}}; r.readAsText(f); }
-function download(name,content,type){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type})); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
-function saveSettings(){ const s={morningReminder:$('morningReminder').value,eveningReminder:$('eveningReminder').value,pricePerUnit:+$('pricePerUnit').value||4.5,rangeDays:+$('rangeDays').value}; try{localStorage.setItem(SET,JSON.stringify(s)); alert('บันทึกตั้งค่าแล้ว');}catch(e){alert('บันทึกตั้งค่าไม่สำเร็จ')} render(); }
-function requestNotify(){ if(!('Notification' in window)){alert('Browser นี้ไม่รองรับ Notification');return;} Notification.requestPermission().then(p=>alert(p==='granted'?'เปิดแจ้งเตือนแล้ว':'ยังไม่ได้อนุญาตแจ้งเตือน')); }
-let lastNotify=''; function checkReminder(){ if(!('Notification' in window)||Notification.permission!=='granted')return; const s=loadSettings(), t=nowTime(), key=t+'-'+today(); if(lastNotify===key)return; if(t===s.morningReminder){new Notification('จดมิเตอร์รอบเช้า',{body:'เวลา 07.00 - 08.00 ก่อนเริ่มใช้ไฟ'}); lastNotify=key;} if(t===s.eveningReminder){new Notification('จดมิเตอร์รอบเย็น',{body:'เวลา 18.00 - 19.00 หลังทุกคนกลับบ้าน'}); lastNotify=key;} }
-function showPage(id,el){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); $(id).classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); if(el)el.classList.add('active'); renderDashboard(); }
-init();
-
-if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-  });
-}
+const $=id=>document.getElementById(id); let DB=null; let currentPhoto=''; const DB_NAME='solar_meter_tracker_db_v3'; const STORE='records'; const SETTINGS='solar_meter_settings_v3';
+function today(){return new Date().toISOString().slice(0,10)} function nowTime(){return new Date().toTimeString().slice(0,5)}
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,1);r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE,{keyPath:'date'});};r.onsuccess=()=>{DB=r.result;res(DB)};r.onerror=()=>rej(r.error);});}
+function tx(mode='readonly'){return DB.transaction(STORE,mode).objectStore(STORE)}
+function getAll(){return new Promise((res,rej)=>{const r=tx().getAll();r.onsuccess=()=>res((r.result||[]).sort((a,b)=>a.date.localeCompare(b.date)));r.onerror=()=>rej(r.error);});}
+function putDay(day){return new Promise((res,rej)=>{const r=tx('readwrite').put(day);r.onsuccess=()=>res(true);r.onerror=()=>rej(r.error);});}
+function getDay(date){return new Promise((res,rej)=>{const r=tx().get(date);r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error);});}
+function delDay(date){return new Promise((res,rej)=>{const r=tx('readwrite').delete(date);r.onsuccess=()=>res(true);r.onerror=()=>rej(r.error);});}
+function clearDB(){return new Promise((res,rej)=>{const r=tx('readwrite').clear();r.onsuccess=()=>res(true);r.onerror=()=>rej(r.error);});}
+function loadSettings(){try{return Object.assign({morningReminder:'07:30',eveningReminder:'18:30',pricePerUnit:4.5,rangeDays:30},JSON.parse(localStorage.getItem(SETTINGS)||'{}'))}catch(e){return {morningReminder:'07:30',eveningReminder:'18:30',pricePerUnit:4.5,rangeDays:30}}}
+function saveSettings(){const s={morningReminder:$('morningReminder').value,eveningReminder:$('eveningReminder').value,pricePerUnit:+$('pricePerUnit').value||4.5,rangeDays:+$('rangeDays').value};localStorage.setItem(SETTINGS,JSON.stringify(s));alert('บันทึกตั้งค่าแล้ว');render();}
+function fillNow(){ $('time').value=nowTime(); $('period').value=new Date().getHours()<13?'morning':'evening'; }
+function clearForm(){ $('meter').value='';$('note').value='';$('photoLibrary').value='';$('photoCamera').value='';$('preview').src='';$('preview').classList.add('hide');currentPhoto='';$('saveStatus').textContent=''; }
+async function compressImage(file,max=1100,q=.7){return new Promise((res,rej)=>{const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height,s=Math.min(1,max/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',q));};img.onerror=rej;img.src=reader.result};reader.onerror=rej;reader.readAsDataURL(file);});}
+async function handlePhoto(e){const f=e.target.files && e.target.files[0]; if(!f)return; try{currentPhoto=await compressImage(f);$('preview').src=currentPhoto;$('preview').classList.remove('hide');$('saveStatus').textContent='เลือกรูปแล้ว พร้อมบันทึก';}catch(err){alert('อ่านรูปไม่สำเร็จ ลองเลือกรูปใหม่')}}
+$('photoLibrary').addEventListener('change',handlePhoto);$('photoCamera').addEventListener('change',handlePhoto);
+async function saveRecord(){try{const date=$('date').value,period=$('period').value,time=$('time').value,meter=parseFloat($('meter').value);if(!date||!time||isNaN(meter)){alert('กรุณาใส่วันที่ เวลา และเลขมิเตอร์');return}let day=await getDay(date)||{date,morning:null,evening:null};day[period]={time,meter,photo:currentPhoto,note:$('note').value||'',updatedAt:new Date().toISOString()};await putDay(day);$('saveStatus').textContent='✅ บันทึกสำเร็จแล้ว';const keep=date;clearForm();$('date').value=keep;await render();showPage('dashboard',document.querySelectorAll('.tab')[0]);}catch(e){console.error(e);alert('บันทึกไม่สำเร็จ: ถ้าแนบรูปอยู่ ลองเลือกรูปขนาดเล็กลง หรือกด Backup แล้วล้างข้อมูลเก่า')}}
+function unit(x){return x==null?'-':x+' หน่วย'} function avg(a){const v=a.filter(x=>typeof x==='number'&&isFinite(x)&&x>=0);return v.length?+(v.reduce((s,n)=>s+n,0)/v.length).toFixed(2):null}
+async function calcRows(){const data=await getAll();return data.map((d,i)=>{const dayUse=d.morning&&d.evening?+(d.evening.meter-d.morning.meter).toFixed(2):null;const next=data[i+1];const nightUse=d.evening&&next&&next.morning?+(next.morning.meter-d.evening.meter).toFixed(2):null;return {...d,dayUse,nightUse}})}
+async function filteredRows(){const rows=await calcRows();const s=loadSettings();if(+s.rangeDays>=9999)return rows;const min=new Date();min.setDate(min.getDate()-Number(s.rangeDays)+1);const minStr=min.toISOString().slice(0,10);return rows.filter(r=>r.date>=minStr)}
+async function render(){await renderHistory();await renderDashboard();}
+async function renderDashboard(){const rows=await filteredRows();const latestDay=[...rows].reverse().find(r=>r.dayUse!=null);const latestNight=[...rows].reverse().find(r=>r.nightUse!=null);const ad=avg(rows.map(r=>r.dayUse));const an=avg(rows.map(r=>r.nightUse));$('dayUse').textContent=unit(latestDay?.dayUse);$('nightUse').textContent=unit(latestNight?.nightUse);$('avgDay').textContent=unit(ad);$('avgNight').textContent=unit(an);const totalDay=rows.reduce((s,r)=>s+(r.dayUse>0?r.dayUse:0),0);const totalNight=rows.reduce((s,r)=>s+(r.nightUse>0?r.nightUse:0),0);const total=+(totalDay+totalNight).toFixed(2);const pct=total?Math.round(totalDay/total*100):0;$('dayPercent').textContent=total?pct+'%':'-';$('dayBar').style.width=pct+'%';$('totalUse').textContent=total?total+' หน่วย':'-';$('solarHint').textContent=!total?'-':pct>=60?'คุ้มกับ On-grid มาก':pct>=40?'น่าสนใจ ควรประเมินโหลดกลางวัน':'กลางคืนสูง อาจต้องดูแบต/ปรับพฤติกรรม';drawChart(rows)}
+function drawChart(rows){const max=Math.max(1,...rows.map(r=>Math.max(r.dayUse||0,r.nightUse||0)));const w=900,h=220,p=28,bw=Math.max(8,(w-p*2)/(Math.max(rows.length,1)*2.6));let bars='',labels='';rows.forEach((r,i)=>{const x=p+i*((w-p*2)/Math.max(rows.length,1));const dh=((r.dayUse||0)/max)*(h-55),nh=((r.nightUse||0)/max)*(h-55);bars+=`<rect x="${x}" y="${h-30-dh}" width="${bw}" height="${dh}" fill="#f59e0b" rx="3"/><rect x="${x+bw+3}" y="${h-30-nh}" width="${bw}" height="${nh}" fill="#6366f1" rx="3"/>`;labels+=`<text x="${x}" y="${h-8}" font-size="11" fill="#6b7280">${r.date.slice(5)}</text>`});$('chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" width="100%" height="100%"><line x1="${p}" y1="${h-30}" x2="${w-p}" y2="${h-30}" stroke="#d1d5db"/>${bars}${labels}<text x="${p}" y="16" font-size="12" fill="#f59e0b">■ กลางวัน</text><text x="120" y="16" font-size="12" fill="#6366f1">■ กลางคืน</text></svg>`}
+async function renderHistory(){const rows=(await calcRows()).slice().reverse();const body=$('historyBody');if(!rows.length){body.innerHTML='<tr><td colspan="8" class="empty">ยังไม่มีข้อมูล</td></tr>';return}body.innerHTML=rows.map(r=>`<tr><td><b>${r.date}</b></td><td>${r.morning?`${r.morning.meter}<br><span class="small">${r.morning.time}</span><br><span class="small">${r.morning.note||''}</span>`:'-'}</td><td>${r.morning?.photo?`<img class="meter-img" src="${r.morning.photo}" onclick="openImg(this.src)">`:'-'}</td><td>${r.evening?`${r.evening.meter}<br><span class="small">${r.evening.time}</span><br><span class="small">${r.evening.note||''}</span>`:'-'}</td><td>${r.evening?.photo?`<img class="meter-img" src="${r.evening.photo}" onclick="openImg(this.src)">`:'-'}</td><td>${unit(r.dayUse)}</td><td>${unit(r.nightUse)}</td><td><button class="danger" onclick="deleteDate('${r.date}')">ลบ</button></td></tr>`).join('')}
+function openImg(src){const w=window.open('');w.document.write(`<img src="${src}" style="max-width:100%;height:auto">`)} async function deleteDate(date){if(confirm('ลบข้อมูลวันที่ '+date+' ?')){await delDay(date);render()}} async function deleteAll(){if(confirm('ลบข้อมูลทั้งหมดจริงไหม?')){await clearDB();render()}}
+function download(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+async function exportCSV(){const rows=await calcRows();let csv='date,morning_time,morning_meter,evening_time,evening_meter,day_use,night_use,morning_note,evening_note\n';rows.forEach(r=>csv+=[r.date,r.morning?.time||'',r.morning?.meter||'',r.evening?.time||'',r.evening?.meter||'',r.dayUse??'',r.nightUse??'',`"${(r.morning?.note||'').replaceAll('"','""')}"`,`"${(r.evening?.note||'').replaceAll('"','""')}"`].join(',')+'\n');download('solar-meter-data.csv',csv,'text/csv;charset=utf-8')}
+async function backupJSON(){download('solar-meter-backup.json',JSON.stringify({records:await getAll(),settings:loadSettings()},null,2),'application/json')}
+function importJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const obj=JSON.parse(r.result);const arr=Array.isArray(obj)?obj:(obj.records||[]);for(const item of arr){if(item.date)await putDay(item)}if(obj.settings)localStorage.setItem(SETTINGS,JSON.stringify(obj.settings));alert('Import สำเร็จ');await render()}catch(err){alert('ไฟล์ไม่ถูกต้อง')}};r.readAsText(f)}
+function requestNotify(){if(!('Notification' in window)){alert('Browser นี้ไม่รองรับ Notification');return}Notification.requestPermission().then(p=>alert(p==='granted'?'เปิดแจ้งเตือนแล้ว':'ยังไม่ได้อนุญาตแจ้งเตือน'))}
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');renderDashboard()}
+async function init(){await openDB();$('date').value=today();fillNow();const s=loadSettings();$('morningReminder').value=s.morningReminder;$('eveningReminder').value=s.eveningReminder;$('pricePerUnit').value=s.pricePerUnit;$('rangeDays').value=s.rangeDays;await render()} init();
+if('serviceWorker'in navigator&&location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}))}
 </script>
 </body>
 </html>
